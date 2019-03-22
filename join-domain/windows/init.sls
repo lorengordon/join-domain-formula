@@ -1,5 +1,14 @@
 {%- from tpldir + '/map.jinja' import join_domain with context %}
 
+set dns search suffix:
+  cmd.script:
+    - name: salt://{{ tpldir }}/files/Set-DnsSearchSuffix.ps1
+    - args: >-
+        -DnsSearchSuffixes {{ join_domain.dns_name }}
+        -Ec2ConfigSetDnsSuffixList {{ join_domain.ec2config }}
+        -ErrorAction Stop
+    - shell: powershell
+
 join standalone system to domain:
   cmd.script:
     - name: salt://{{ tpldir }}/files/JoinDomain.ps1
@@ -13,6 +22,8 @@ join standalone system to domain:
         -ErrorAction Stop
     - shell: powershell
     - stateful: true
+    - require:
+      - cmd: set dns search suffix
 
 {%- if join_domain.admins %}
 {%- set admins = join_domain.admins | join(',') %}
@@ -44,14 +55,3 @@ register startup task:
       - cmd: join standalone system to domain
 
 {%- endif %}
-
-set dns search suffix:
-  cmd.script:
-    - name: salt://{{ tpldir }}/files/Set-DnsSearchSuffix.ps1
-    - args: >-
-        -DnsSearchSuffixes {{ join_domain.dns_name }}
-        -Ec2ConfigSetDnsSuffixList {{ join_domain.ec2config }}
-        -ErrorAction Stop
-    - shell: powershell
-    - require:
-      - cmd: join standalone system to domain
