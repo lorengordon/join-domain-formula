@@ -36,6 +36,7 @@ PBIS-join:
     - stateful: True
     - require:
       - cmd: PBIS-NETBIOSfix
+    - output_loglevel: quiet
 
 PBIS-PamPasswordDemunge:
   cmd.script:

@@ -13,6 +13,7 @@ join standalone system to domain:
         -ErrorAction Stop
     - shell: powershell
     - stateful: true
+    - output_loglevel: quiet
 
 {%- if join_domain.admins %}
 {%- set admins = [] %}
