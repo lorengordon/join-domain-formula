@@ -20,9 +20,8 @@ PBIS-install:
 
 PBIS-NETBIOSfix:
   cmd.script:
-    - name: 'fix-hostname.sh'
-    - source: 'salt://{{ files }}/fix-hostname.sh'
-    - cwd: '/root'
+    - name: salt://{{ files }}/fix-hostname.sh
+    - cwd: /root
     - stateful: True
     - require:
       - pkg: PBIS-install
@@ -30,9 +29,15 @@ PBIS-NETBIOSfix:
 
 PBIS-join:
   cmd.script:
-    - name: 'join.sh "{{ join_domain.netbios_name }}" "{{ join_domain.dns_name }}" "{{ join_domain.username }}" "{{ join_domain.encrypted_password }}" "{{ join_domain.key }}" "{{ join_domain.oupath }}"'
-    - source: 'salt://{{ files }}/join.sh'
-    - cwd: '/root'
+    - name: salt://{{ files }}/join.sh
+    - args: >-
+        "{{ join_domain.netbios_name }}"
+        "{{ join_domain.dns_name }}"
+        "{{ join_domain.username }}"
+        "{{ join_domain.encrypted_password }}"
+        "{{ join_domain.key }}"
+        "{{ join_domain.oupath }}"
+    - cwd: /root
     - stateful: True
     - require:
       - cmd: PBIS-NETBIOSfix
@@ -40,18 +45,18 @@ PBIS-join:
 
 PBIS-PamPasswordDemunge:
   cmd.script:
-    - name: 'fix-pam.sh "/etc/pam.d/password-auth"'
-    - source: 'salt://{{ files }}/fix-pam.sh'
-    - cwd: '/root'
+    - name: salt://{{ files }}/fix-pam.sh
+    - args: /etc/pam.d/password-auth
+    - cwd: /root
     - stateful: True
     - require:
       - cmd: PBIS-join
 
 PBIS-PamSystemDemunge:
   cmd.script:
-    - name: 'fix-pam.sh "/etc/pam.d/system-auth"'
-    - source: 'salt://{{ files }}/fix-pam.sh'
-    - cwd: '/root'
+    - name: salt://{{ files }}/fix-pam.sh
+    - args: /etc/pam.d/system-auth
+    - cwd: /root
     - stateful: True
     - require:
       - cmd: PBIS-join
